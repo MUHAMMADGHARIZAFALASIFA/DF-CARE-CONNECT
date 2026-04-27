@@ -1,99 +1,1154 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Website Rekomendasi Jurusan & Kampus</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+<!doctype html>
+<html lang="id" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Komunikasi Interpersonal</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script>
+// Dummy elementSdk
+window.elementSdk = {
+  config: {},
+  init: function({defaultConfig, onConfigChange}) {
+    this.config = defaultConfig;
+    if (onConfigChange) onConfigChange(defaultConfig);
+  },
+  setConfig: function(newConfig) {
+    this.config = {...this.config, ...newConfig};
+  }
+};
 
-    <header>
-        <h1>DF Care & Connect</h1>
-        <nav>
-            <a href="#sambutan">Beranda</a>
-            <a href="#pengertian">Pengertian</a>
-            <a href="#quiz">Quiz</a>
-            <a href="#rekomendasi">Rekomendasi Jurusan</a>
-            <a href="#konselor">Hubungi Konselor</a>
-        </nav>
-    </header>
+// Dummy dataSdk (pakai localStorage)
+window.dataSdk = {
+  init: async function(handler) {
+    const data = JSON.parse(localStorage.getItem('appData') || '[]');
+    handler.onDataChanged(data);
+    this.handler = handler;
+    return { isOk: true };
+  },
+  create: async function(obj) {
+    let data = JSON.parse(localStorage.getItem('appData') || '[]');
+    obj.__backendId = Date.now().toString();
+    data.push(obj);
+    localStorage.setItem('appData', JSON.stringify(data));
+    this.handler.onDataChanged(data);
+    return { isOk: true };
+  },
+  delete: async function(obj) {
+    let data = JSON.parse(localStorage.getItem('appData') || '[]');
+    data = data.filter(d => d.__backendId !== obj.__backendId);
+    localStorage.setItem('appData', JSON.stringify(data));
+    this.handler.onDataChanged(data);
+    return { isOk: true };
+  }
+};
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&amp;family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        heading: ['Nunito', 'sans-serif'],
+        body: ['Quicksand', 'sans-serif']
+      }
+    }
+  }
+}
+</script>
+  <style>
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes pulse-soft { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+@keyframes slideIn { from{opacity:0;transform:translateX(-20px)} to{opacity:1;transform:translateX(0)} }
+@keyframes popIn { from{opacity:0;transform:scale(0.8)} to{opacity:1;transform:scale(1)} }
+@keyframes confetti { 0%{transform:translateY(0) rotate(0)} 100%{transform:translateY(-50px) rotate(360deg);opacity:0} }
+.float-anim { animation: float 3s ease-in-out infinite; }
+.fade-up { animation: fadeUp 0.5s ease-out forwards; }
+.slide-in { animation: slideIn 0.4s ease-out forwards; }
+.pop-in { animation: popIn 0.3s ease-out forwards; }
+.pulse-soft { animation: pulse-soft 2s ease-in-out infinite; }
+.confetti-burst { animation: confetti 1s ease-out forwards; }
+.nav-item { transition: all 0.2s; }
+.nav-item:hover { transform: translateY(-2px); }
+.nav-item.active { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; box-shadow: 0 4px 15px rgba(99,102,241,0.4); }
+.card-hover { transition: all 0.3s; }
+.card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
+.btn-primary { background: linear-gradient(135deg, #6366f1, #8b5cf6); transition: all 0.2s; }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(99,102,241,0.4); }
+.progress-ring { transition: stroke-dashoffset 0.8s ease-out; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+html, body { height: 100%; margin: 0; }
+.app-shell { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+.app-content { flex: 1; overflow-y: auto; overflow-x: hidden; }
+.toast-msg { position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;padding:12px 24px;border-radius:12px;font-family:'Quicksand',sans-serif;font-weight:600;box-shadow:0 8px 25px rgba(0,0,0,0.15);transition:all 0.3s;opacity:0;pointer-events:none; }
+.toast-msg.show { opacity:1; }
+.scenario-bubble { background: linear-gradient(135deg, #ede9fe, #e0e7ff); border-radius: 18px 18px 18px 4px; padding: 16px; max-width: 85%; }
+.response-bubble { border-radius: 18px 18px 4px 18px; padding: 12px 16px; cursor: pointer; transition: all 0.2s; }
+.response-bubble:hover { transform: scale(1.02); }
+</style>
+  <style>body { box-sizing: border-box; }</style>
+ </head>
+ <body class="h-full bg-gradient-to-br from-indigo-50 via-purple-50 to-amber-50 font-body">
+  <div class="app-shell w-full" id="app"><!-- Toast -->
+   <div class="toast-msg bg-green-500 text-white" id="toast"></div><!-- Top Bar -->
+   <header class="flex items-center justify-between px-4 py-3 bg-white/80 backdrop-blur-md border-b border-indigo-100 shrink-0">
+    <div class="flex items-center gap-2">
+     <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center"><span class="text-white text-lg">💬</span>
+     </div>
+     <h1 class="font-heading font-800 text-indigo-900 text-lg" id="topTitle">DF CARE AND CONNECT</h1>
+    </div><button onclick="showPage('guru')" class="text-xs font-semibold px-3 py-1.5 rounded-full bg-amber-100 text-amber-700 hover:bg-amber-200 transition"> 👩‍🏫 Guru BK </button>
+   </header><!-- Content Area -->
+   <div class="app-content" id="contentArea"><!-- HOME PAGE -->
+    <div id="page-home" class="page px-4 py-6">
+     <div class="text-center mb-6 fade-up">
+      <div class="text-6xl mb-3 float-anim inline-block">
+       🗣️
+      </div>
+      <h2 class="font-heading font-900 text-3xl bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent" id="heroTitle">Komunikasi Interpersonal</h2>
+      <p class="text-indigo-500 font-semibold mt-2 text-lg" id="heroSlogan">✨ Komunikasi Hebat, Relasi Kuat ✨</p>
+      <p class="text-gray-500 text-sm mt-2 max-w-xs mx-auto">Yuk belajar berkomunikasi dengan lebih baik bersama teman, guru, dan orang tua!</p>
+     </div>
+     <div class="grid grid-cols-2 gap-3 max-w-md mx-auto"><button onclick="showPage('materi')" class="card-hover bg-white rounded-2xl p-4 text-center border border-indigo-100 fade-up" style="animation-delay:0.1s">
+       <div class="text-3xl mb-2">
+        📚
+       </div><p class="font-heading font-700 text-indigo-800 text-sm">Materi</p><p class="text-xs text-gray-400 mt-1">Belajar komunikasi</p></button> <button onclick="showPage('simulasi')" class="card-hover bg-white rounded-2xl p-4 text-center border border-purple-100 fade-up" style="animation-delay:0.2s">
+       <div class="text-3xl mb-2">
+        🎭
+       </div><p class="font-heading font-700 text-purple-800 text-sm">Simulasi</p><p class="text-xs text-gray-400 mt-1">Role play seru</p></button> <button onclick="showPage('quiz')" class="card-hover bg-white rounded-2xl p-4 text-center border border-amber-100 fade-up" style="animation-delay:0.3s">
+       <div class="text-3xl mb-2">
+        🧠
+       </div><p class="font-heading font-700 text-amber-800 text-sm">Quiz</p><p class="text-xs text-gray-400 mt-1">Uji pemahamanmu</p></button> <button onclick="showPage('jurnal')" class="card-hover bg-white rounded-2xl p-4 text-center border border-green-100 fade-up" style="animation-delay:0.4s">
+       <div class="text-3xl mb-2">
+        📝
+       </div><p class="font-heading font-700 text-green-800 text-sm">Jurnal</p><p class="text-xs text-gray-400 mt-1">Diary harianmu</p></button>
+     </div><button onclick="showPage('progress')" class="mt-4 w-full max-w-md mx-auto block card-hover bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-2xl p-4 text-center fade-up" style="animation-delay:0.5s">
+      <div class="flex items-center justify-center gap-3"><span class="text-2xl">📊</span>
+       <div class="text-left">
+        <p class="font-heading font-700">Progress Tracker</p>
+        <p class="text-xs text-indigo-100">Lihat perkembanganmu</p>
+       </div>
+      </div></button>
+    </div><!-- MATERI PAGE -->
+    <div id="page-materi" class="page px-4 py-6 hidden"><button onclick="showPage('home')" class="flex items-center gap-1 text-indigo-500 font-semibold text-sm mb-4"><i data-lucide="arrow-left" style="width:16px;height:16px"></i> Kembali</button>
+     <h2 class="font-heading font-800 text-2xl text-indigo-900 mb-4">📚 Materi Interaktif</h2><!-- Tabs -->
+     <div class="flex gap-2 mb-4 overflow-x-auto pb-2"><button onclick="showMateriTab('pengertian')" class="materi-tab whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold bg-indigo-500 text-white transition">Pengertian</button> <button onclick="showMateriTab('jenis')" class="materi-tab whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold bg-gray-100 text-gray-600 transition">Jenis</button> <button onclick="showMateriTab('tips')" class="materi-tab whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold bg-gray-100 text-gray-600 transition">Tips Efektif</button>
+     </div>
+     <div id="materi-pengertian" class="tab-content active slide-in">
+      <div class="bg-white rounded-2xl p-5 border border-indigo-100 space-y-4">
+       <div class="flex items-start gap-3">
+        <div class="text-3xl">
+         🤝
+        </div>
+        <div>
+         <h3 class="font-heading font-700 text-indigo-800">Apa itu Komunikasi Interpersonal?</h3>
+         <p class="text-gray-600 text-sm mt-1">Komunikasi interpersonal adalah proses pertukaran pesan, ide, dan perasaan antara <strong>dua orang atau lebih</strong> secara langsung (tatap muka) maupun melalui media.</p>
+        </div>
+       </div>
+       <div class="bg-indigo-50 rounded-xl p-4">
+        <p class="font-semibold text-indigo-700 text-sm mb-2">🔑 Komponen Utama:</p>
+        <div class="space-y-2">
+         <div class="flex items-center gap-2">
+          <span class="w-6 h-6 rounded-full bg-indigo-200 flex items-center justify-center text-xs font-bold text-indigo-700">1</span><span class="text-sm text-gray-700">Pengirim (Sender)</span>
+         </div>
+         <div class="flex items-center gap-2">
+          <span class="w-6 h-6 rounded-full bg-indigo-200 flex items-center justify-center text-xs font-bold text-indigo-700">2</span><span class="text-sm text-gray-700">Pesan (Message)</span>
+         </div>
+         <div class="flex items-center gap-2">
+          <span class="w-6 h-6 rounded-full bg-indigo-200 flex items-center justify-center text-xs font-bold text-indigo-700">3</span><span class="text-sm text-gray-700">Saluran (Channel)</span>
+         </div>
+         <div class="flex items-center gap-2">
+          <span class="w-6 h-6 rounded-full bg-indigo-200 flex items-center justify-center text-xs font-bold text-indigo-700">4</span><span class="text-sm text-gray-700">Penerima (Receiver)</span>
+         </div>
+         <div class="flex items-center gap-2">
+          <span class="w-6 h-6 rounded-full bg-indigo-200 flex items-center justify-center text-xs font-bold text-indigo-700">5</span><span class="text-sm text-gray-700">Umpan balik (Feedback)</span>
+         </div>
+        </div>
+       </div>
+       <div class="bg-amber-50 rounded-xl p-4">
+        <p class="text-sm text-amber-800">💡 <strong>Tahukah kamu?</strong> Menurut penelitian, 93% komunikasi kita sebenarnya dipengaruhi oleh nada suara dan bahasa tubuh, bukan hanya kata-kata!</p>
+       </div>
+      </div>
+     </div>
+     <div id="materi-jenis" class="tab-content">
+      <div class="space-y-3">
+       <div class="bg-white rounded-2xl p-5 border border-purple-100">
+        <div class="flex items-start gap-3">
+         <div class="text-3xl">
+          🗣️
+         </div>
+         <div>
+          <h3 class="font-heading font-700 text-purple-800">Komunikasi Verbal</h3>
+          <p class="text-gray-600 text-sm mt-1">Menggunakan <strong>kata-kata</strong>, baik lisan maupun tulisan.</p>
+          <div class="mt-3 flex flex-wrap gap-2"><span class="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-semibold">Berbicara</span> <span class="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-semibold">Menulis</span> <span class="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-semibold">Chat</span> <span class="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-semibold">Presentasi</span>
+          </div>
+         </div>
+        </div>
+       </div>
+       <div class="bg-white rounded-2xl p-5 border border-pink-100">
+        <div class="flex items-start gap-3">
+         <div class="text-3xl">
+          🙌
+         </div>
+         <div>
+          <h3 class="font-heading font-700 text-pink-800">Komunikasi Non-Verbal</h3>
+          <p class="text-gray-600 text-sm mt-1">Menggunakan <strong>isyarat tubuh</strong>, ekspresi wajah, kontak mata, dan gestur.</p>
+          <div class="mt-3 grid grid-cols-2 gap-2">
+           <div class="bg-pink-50 rounded-xl p-3 text-center">
+            <div class="text-2xl">
+             😊
+            </div>
+            <p class="text-xs text-pink-700 font-semibold mt-1">Ekspresi Wajah</p>
+           </div>
+           <div class="bg-pink-50 rounded-xl p-3 text-center">
+            <div class="text-2xl">
+             👁️
+            </div>
+            <p class="text-xs text-pink-700 font-semibold mt-1">Kontak Mata</p>
+           </div>
+           <div class="bg-pink-50 rounded-xl p-3 text-center">
+            <div class="text-2xl">
+             🤲
+            </div>
+            <p class="text-xs text-pink-700 font-semibold mt-1">Gestur Tangan</p>
+           </div>
+           <div class="bg-pink-50 rounded-xl p-3 text-center">
+            <div class="text-2xl">
+             🧍
+            </div>
+            <p class="text-xs text-pink-700 font-semibold mt-1">Postur Tubuh</p>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+      </div>
+     </div>
+     <div id="materi-tips" class="tab-content">
+      <div class="space-y-3">
+       <div class="bg-white rounded-2xl p-4 border border-green-100 flex items-start gap-3 card-hover">
+        <div class="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center text-xl shrink-0">
+         👂
+        </div>
+        <div>
+         <h4 class="font-heading font-700 text-green-800 text-sm">Active Listening</h4>
+         <p class="text-xs text-gray-500 mt-1">Dengarkan dengan penuh perhatian. Jangan potong pembicaraan orang lain.</p>
+        </div>
+       </div>
+       <div class="bg-white rounded-2xl p-4 border border-blue-100 flex items-start gap-3 card-hover">
+        <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-xl shrink-0">
+         💬
+        </div>
+        <div>
+         <h4 class="font-heading font-700 text-blue-800 text-sm">Gunakan "Saya" bukan "Kamu"</h4>
+         <p class="text-xs text-gray-500 mt-1">"Saya merasa sedih" lebih baik dari "Kamu membuat saya sedih".</p>
+        </div>
+       </div>
+       <div class="bg-white rounded-2xl p-4 border border-amber-100 flex items-start gap-3 card-hover">
+        <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-xl shrink-0">
+         😊
+        </div>
+        <div>
+         <h4 class="font-heading font-700 text-amber-800 text-sm">Tunjukkan Empati</h4>
+         <p class="text-xs text-gray-500 mt-1">Cobalah memahami perasaan dan sudut pandang orang lain sebelum merespon.</p>
+        </div>
+       </div>
+       <div class="bg-white rounded-2xl p-4 border border-rose-100 flex items-start gap-3 card-hover">
+        <div class="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center text-xl shrink-0">
+         🪞
+        </div>
+        <div>
+         <h4 class="font-heading font-700 text-rose-800 text-sm">Perhatikan Bahasa Tubuh</h4>
+         <p class="text-xs text-gray-500 mt-1">Pastikan ekspresi wajah &amp; gestur mendukung kata-kata yang kamu ucapkan.</p>
+        </div>
+       </div>
+       <div class="bg-white rounded-2xl p-4 border border-teal-100 flex items-start gap-3 card-hover">
+        <div class="w-10 h-10 rounded-xl bg-teal-100 flex items-center justify-center text-xl shrink-0">
+         ⏰
+        </div>
+        <div>
+         <h4 class="font-heading font-700 text-teal-800 text-sm">Pilih Waktu yang Tepat</h4>
+         <p class="text-xs text-gray-500 mt-1">Sampaikan hal penting saat suasana tenang, bukan saat emosi tinggi.</p>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div><!-- SIMULASI PAGE -->
+    <div id="page-simulasi" class="page px-4 py-6 hidden"><button onclick="showPage('home')" class="flex items-center gap-1 text-indigo-500 font-semibold text-sm mb-4"><i data-lucide="arrow-left" style="width:16px;height:16px"></i> Kembali</button>
+     <h2 class="font-heading font-800 text-2xl text-indigo-900 mb-2">🎭 Simulasi Role Play</h2>
+     <p class="text-sm text-gray-500 mb-4">Pilih respon terbaik untuk setiap situasi!</p>
+     <div id="simContainer"></div>
+    </div><!-- QUIZ PAGE -->
+    <div id="page-quiz" class="page px-4 py-6 hidden"><button onclick="showPage('home')" class="flex items-center gap-1 text-indigo-500 font-semibold text-sm mb-4"><i data-lucide="arrow-left" style="width:16px;height:16px"></i> Kembali</button>
+     <h2 class="font-heading font-800 text-2xl text-indigo-900 mb-2">🧠 Quiz Reflektif</h2>
+     <p class="text-sm text-gray-500 mb-4">Uji pemahamanmu tentang komunikasi interpersonal!</p>
+     <div id="quizContainer"></div>
+    </div><!-- JURNAL PAGE -->
+    <div id="page-jurnal" class="page px-4 py-6 hidden"><button onclick="showPage('home')" class="flex items-center gap-1 text-indigo-500 font-semibold text-sm mb-4"><i data-lucide="arrow-left" style="width:16px;height:16px"></i> Kembali</button>
+     <h2 class="font-heading font-800 text-2xl text-indigo-900 mb-2">📝 Jurnal Harian</h2>
+     <p class="text-sm text-gray-500 mb-4">Ceritakan pengalaman komunikasimu hari ini</p>
+     <form id="jurnalForm" class="bg-white rounded-2xl p-5 border border-green-100 mb-4"><label for="jurnalInput" class="block font-heading font-700 text-green-800 text-sm mb-2">✍️ Tulis ceritamu...</label> <textarea id="jurnalInput" rows="4" class="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-300 resize-none" placeholder="Hari ini aku berbicara dengan..."></textarea>
+      <div class="flex items-center justify-between mt-3"><span class="text-xs text-gray-400" id="jurnalDate"></span> <button type="submit" class="btn-primary text-white text-sm font-semibold px-5 py-2 rounded-full" id="jurnalSubmitBtn">Simpan</button>
+      </div>
+     </form>
+     <div id="jurnalList" class="space-y-3"></div>
+    </div><!-- PROGRESS PAGE -->
+    <div id="page-progress" class="page px-4 py-6 hidden"><button onclick="showPage('home')" class="flex items-center gap-1 text-indigo-500 font-semibold text-sm mb-4"><i data-lucide="arrow-left" style="width:16px;height:16px"></i> Kembali</button>
+     <h2 class="font-heading font-800 text-2xl text-indigo-900 mb-4">📊 Progress Tracker</h2>
+     <div class="grid grid-cols-3 gap-3 mb-4">
+      <div class="bg-white rounded-2xl p-4 text-center border border-indigo-100">
+       <div class="text-2xl font-heading font-900 text-indigo-600" id="statQuiz">
+        0
+       </div>
+       <p class="text-xs text-gray-500 mt-1">Quiz Selesai</p>
+      </div>
+      <div class="bg-white rounded-2xl p-4 text-center border border-purple-100">
+       <div class="text-2xl font-heading font-900 text-purple-600" id="statSim">
+        0
+       </div>
+       <p class="text-xs text-gray-500 mt-1">Simulasi</p>
+      </div>
+      <div class="bg-white rounded-2xl p-4 text-center border border-green-100">
+       <div class="text-2xl font-heading font-900 text-green-600" id="statJurnal">
+        0
+       </div>
+       <p class="text-xs text-gray-500 mt-1">Jurnal</p>
+      </div>
+     </div>
+     <div class="bg-white rounded-2xl p-5 border border-indigo-100 mb-4">
+      <h3 class="font-heading font-700 text-indigo-800 mb-3">Skor Quiz Terakhir</h3>
+      <div id="progressChart" class="flex items-end gap-2 h-32"></div>
+      <p class="text-xs text-gray-400 mt-2 text-center" id="noScoreMsg">Belum ada data quiz</p>
+     </div>
+     <div class="bg-white rounded-2xl p-5 border border-amber-100">
+      <h3 class="font-heading font-700 text-amber-800 mb-3">Aktivitas Terbaru</h3>
+      <div id="activityList" class="space-y-2">
+       <p class="text-sm text-gray-400">Belum ada aktivitas</p>
+      </div>
+     </div>
+    </div><!-- GURU BK PAGE -->
+    <div id="page-guru" class="page px-4 py-6 hidden"><button onclick="showPage('home')" class="flex items-center gap-1 text-indigo-500 font-semibold text-sm mb-4"><i data-lucide="arrow-left" style="width:16px;height:16px"></i> Kembali</button>
+     <h2 class="font-heading font-800 text-2xl text-indigo-900 mb-2">👩‍🏫 Dashboard Guru BK</h2>
+     <p class="text-sm text-gray-500 mb-4">Monitoring perkembangan siswa</p>
+     <div class="grid grid-cols-2 gap-3 mb-4">
+      <div class="bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl p-4 text-white">
+       <p class="text-xs opacity-80">Total Aktivitas</p>
+       <p class="text-3xl font-heading font-900" id="guruTotal">0</p>
+      </div>
+      <div class="bg-gradient-to-br from-amber-400 to-orange-400 rounded-2xl p-4 text-white">
+       <p class="text-xs opacity-80">Rata-rata Skor</p>
+       <p class="text-3xl font-heading font-900" id="guruAvg">-</p>
+      </div>
+     </div>
+     <div class="bg-white rounded-2xl p-5 border border-indigo-100 mb-4">
+      <h3 class="font-heading font-700 text-indigo-800 mb-3">📋 Riwayat Quiz</h3>
+      <div id="guruQuizList" class="space-y-2">
+       <p class="text-sm text-gray-400">Belum ada data</p>
+      </div>
+     </div>
+     <div class="bg-white rounded-2xl p-5 border border-green-100 mb-4">
+      <h3 class="font-heading font-700 text-green-800 mb-3">📝 Jurnal Siswa</h3>
+      <div id="guruJurnalList" class="space-y-2">
+       <p class="text-sm text-gray-400">Belum ada jurnal</p>
+      </div>
+     </div>
+     <div class="bg-white rounded-2xl p-5 border border-purple-100">
+      <h3 class="font-heading font-700 text-purple-800 mb-3">🎭 Hasil Simulasi</h3>
+      <div id="guruSimList" class="space-y-2">
+       <p class="text-sm text-gray-400">Belum ada data</p>
+      </div>
+     </div>
+    </div>
+   </div><!-- Bottom Nav -->
+   <nav class="flex justify-around items-center px-2 py-2 bg-white/90 backdrop-blur-md border-t border-indigo-100 shrink-0"><button onclick="showPage('home')" class="nav-item active flex flex-col items-center px-3 py-1.5 rounded-xl text-xs font-semibold" data-nav="home"> <span class="text-lg">🏠</span><span class="mt-0.5">Home</span> </button> <button onclick="showPage('materi')" class="nav-item flex flex-col items-center px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-500" data-nav="materi"> <span class="text-lg">📚</span><span class="mt-0.5">Materi</span> </button> <button onclick="showPage('simulasi')" class="nav-item flex flex-col items-center px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-500" data-nav="simulasi"> <span class="text-lg">🎭</span><span class="mt-0.5">Simulasi</span> </button> <button onclick="showPage('quiz')" class="nav-item flex flex-col items-center px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-500" data-nav="quiz"> <span class="text-lg">🧠</span><span class="mt-0.5">Quiz</span> </button> <button onclick="showPage('jurnal')" class="nav-item flex flex-col items-center px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-500" data-nav="jurnal"> <span class="text-lg">📝</span><span class="mt-0.5">Jurnal</span> </button>
+   </nav>
+  </div>
+  <script>
+// ===== STATE =====
+let allData = [];
+let currentPage = 'home';
 
-    <!-- SECTION SAMBUTAN -->
-    <section id="sambutan">
-        <h2>Selamat Datang 👋</h2>
-        <p>
-            Platform Bimbingan dan Konseling SMA Darul Falah yang hadir untuk membantu siswa berkembang secara pribadi, sosial, dan akademik. Website ini dirancang sebagai ruang yang aman dan nyaman untuk belajar tentang komunikasi interpersonal, mengenali potensi diri, serta mendapatkan rekomendasi jurusan dan perguruan tinggi sesuai minat dan nilai rapor.
-        </p>
-        <p>
-            Melalui layanan ini, siswa dapat mengakses materi, mengisi asesmen, dan berkonsultasi langsung dengan guru BK secara lebih mudah. Kami berharap DF Care and Connect dapat menjadi jembatan komunikasi yang positif dalam mendukung setiap langkah siswa menuju masa depan yang lebih terarah.
-        </p>
-        <p><strong>Your Future, One Step Away 🚀</strong></p>
-    </section>
+// ===== DEFAULT CONFIG =====
+const defaultConfig = {
+  app_title: 'KomIn',
+  slogan_text: 'Komunikasi Hebat, Relasi Kuat',
+  background_color: '#eef2ff',
+  surface_color: '#ffffff',
+  text_color: '#312e81',
+  primary_action_color: '#6366f1',
+  secondary_action_color: '#f59e0b',
+  font_family: 'Nunito',
+  font_size: 16
+};
 
-    <!-- SECTION PENGERTIAN -->
-    <section id="pengertian">
-        <h2>Pengertian Komunikasi Interpersonal</h2>
-        <p>
-           Komunikasi interpersonal adalah cara kita berbicara, mendengar, dan berinteraksi dengan orang lain dalam kehidupan sehari-hari. Komunikasi ini terjadi ketika kita berbicara dengan teman, berdiskusi di kelas, curhat kepada sahabat, bertanya kepada guru, atau berdiskusi dengan orang tua di rumah. Intinya, komunikasi interpersonal adalah komunikasi dua arah yang memungkinkan kita saling memahami dan memberikan respons secara langsung.
-        </p>
-        <p>
-            Bagi siswa SMA, komunikasi interpersonal sangat penting karena masa remaja adalah masa di mana kita banyak berinteraksi dengan lingkungan sekitar. Kita mulai membangun pertemanan yang lebih luas, belajar bekerja sama dalam kelompok, serta belajar menyampaikan pendapat dengan percaya diri. Jika komunikasi kita baik, hubungan dengan teman dan guru juga akan berjalan lebih lancar. Sebaliknya, jika komunikasi kurang baik, bisa terjadi salah paham, konflik, atau bahkan dijauhi teman.
-        </p>
-        <p>
-            Dalam komunikasi interpersonal, bukan hanya kata-kata yang penting, tetapi juga cara kita menyampaikannya. Ekspresi wajah, nada suara, dan bahasa tubuh juga memengaruhi bagaimana orang lain memahami pesan kita. Misalnya, mengatakan “tidak apa-apa” dengan wajah kesal tentu akan memberi makna yang berbeda dibandingkan dengan wajah yang tenang. Oleh karena itu, kita perlu belajar menyampaikan pesan dengan sikap yang baik dan sopan.
-        </p>
-        <p>
-            Sering kali hambatan dalam komunikasi muncul karena kurang percaya diri, takut salah, emosi yang tidak terkontrol, atau terlalu cepat berprasangka buruk terhadap orang lain. Di lingkungan sekolah, masalah seperti salah paham antar teman atau konflik dalam kerja kelompok sering terjadi karena kurangnya komunikasi yang jelas. Maka dari itu, penting bagi siswa untuk belajar mendengarkan dengan baik, tidak memotong pembicaraan, serta berani menyampaikan pendapat dengan cara yang santun.
-        </p>
-        <p>
-            Kemampuan komunikasi interpersonal juga sangat membantu dalam menentukan masa depan. Saat memilih jurusan atau kampus, siswa perlu berdiskusi dengan orang tua, bertanya kepada guru BK, dan menyampaikan minat serta kemampuan yang dimiliki. Jika komunikasi berjalan dengan baik, keputusan yang diambil pun akan lebih matang dan tidak tergesa-gesa.
-        </p>
-        <p>Di era sekarang, komunikasi tidak hanya terjadi secara langsung, tetapi juga melalui media sosial seperti WhatsApp atau Instagram. Namun, komunikasi di dunia digital tetap harus dijaga etika dan kesopanannya. Hindari komentar yang menyakitkan, jangan mudah menyebarkan informasi yang belum jelas kebenarannya, dan tetap gunakan bahasa yang baik.
-        </p>
-        <p>
-            Kesimpulannya, komunikasi interpersonal adalah keterampilan penting yang harus dimiliki setiap siswa SMA. Dengan komunikasi yang baik, kita bisa memiliki banyak teman, lebih percaya diri, lebih mudah menyelesaikan masalah, dan lebih siap menghadapi masa depan. Komunikasi yang baik bukan hanya tentang pandai berbicara, tetapi juga tentang mau mendengar dan menghargai orang lain.
+// ===== ELEMENT SDK =====
+window.elementSdk.init({
+  defaultConfig,
+  onConfigChange: async (config) => {
+    const c = key => config[key] || defaultConfig[key];
+    document.getElementById('topTitle').textContent = c('app_title');
+    document.getElementById('heroTitle').textContent = 'Komunikasi Interpersonal';
+    document.getElementById('heroSlogan').textContent = '✨ ' + c('slogan_text') + ' ✨';
 
-    
-    </section>
+    const ff = c('font_family') + ', Quicksand, sans-serif';
+    document.querySelectorAll('.font-heading').forEach(el => el.style.fontFamily = ff);
 
+    const bs = c('font_size');
+    document.querySelectorAll('h2').forEach(el => el.style.fontSize = (bs * 1.5) + 'px');
+    document.querySelectorAll('p, span').forEach(el => {
+      if (!el.closest('nav') && !el.closest('button')) el.style.fontSize = (bs * 0.875) + 'px';
+    });
 
-    <!-- SECTION QUIZ -->
-    <section id="quiz">
-        <h2>Quiz Interaktif</h2>
-        <iframe src="https://wayground.com/embed/quiz/69d9878e7af2a1cf0024a794" 
-        width="100%" height="600" frameborder="0"></iframe>
-    </section>
-    
-    <!-- SECTION REKOMENDASI -->
-    <section id="rekomendasi">
-        <h2>Sistem Rekomendasi Jurusan & Kampus 🎓</h2>
-        <p>
-            Untuk mendapatkan rekomendasi jurusan dan kampus yang sesuai, silakan:
-        </p>
-        <ol>
-            <li>Masukkan nilai rapor Anda</li>
-            <li>Jawab pertanyaan minat dengan jujur</li>
-            <li>Kirim data melalui Google Form</li>
-        </ol>
-        <p>
-            Hasil akan diolah untuk memberikan gambaran jurusan dan kampus yang sesuai dengan profil Anda.
-        </p>
-         <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSf9EvSI4kUB34u8JlP8MFd3BuZ2CDSjYU21DpWr4RysUsaWnw/viewform?embedded=true" 
-        width="100%" height="900" frameborder="0" marginheight="0" marginwidth="0">
-        Loading…
-        </iframe>
-    </section>
+    document.body.style.background = `linear-gradient(135deg, ${c('background_color')}, #faf5ff, #fffbeb)`;
+    document.querySelectorAll('.bg-white').forEach(el => el.style.backgroundColor = c('surface_color'));
 
-    <!-- SECTION KONSELOR -->
-    <section id="konselor">
-        <h2>Hubungi Konselor</h2>
-        <p>
-           silakan konsultasi dengan guru BK melalui form berikut:
-        </p>
-<iframe src="https://docs.google.com/forms/d/e/1FAIpQLScVKC1Yt9UYoqugw8UUkYJ7mwE-3VTX8YOQOM2phb3BBeNnVg/viewform?embedded=true" width="640" height="1346" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
-       
+    document.querySelectorAll('h2, h3, h4').forEach(el => {
+      if (!el.style.color) el.style.color = c('text_color');
+    });
 
-    <script src="script.js"></script>
-</body>
+    document.querySelectorAll('.btn-primary').forEach(el => {
+      el.style.background = `linear-gradient(135deg, ${c('primary_action_color')}, ${c('secondary_action_color')})`;
+    });
+
+    document.querySelectorAll('.nav-item.active').forEach(el => {
+      el.style.background = `linear-gradient(135deg, ${c('primary_action_color')}, #8b5cf6)`;
+    });
+  },
+  mapToCapabilities: (config) => ({
+    recolorables: [
+      { get: () => config.background_color || defaultConfig.background_color, set: v => { config.background_color = v; window.elementSdk.setConfig({background_color:v}); }},
+      { get: () => config.surface_color || defaultConfig.surface_color, set: v => { config.surface_color = v; window.elementSdk.setConfig({surface_color:v}); }},
+      { get: () => config.text_color || defaultConfig.text_color, set: v => { config.text_color = v; window.elementSdk.setConfig({text_color:v}); }},
+      { get: () => config.primary_action_color || defaultConfig.primary_action_color, set: v => { config.primary_action_color = v; window.elementSdk.setConfig({primary_action_color:v}); }},
+      { get: () => config.secondary_action_color || defaultConfig.secondary_action_color, set: v => { config.secondary_action_color = v; window.elementSdk.setConfig({secondary_action_color:v}); }}
+    ],
+    borderables: [],
+    fontEditable: {
+      get: () => config.font_family || defaultConfig.font_family,
+      set: v => { config.font_family = v; window.elementSdk.setConfig({font_family:v}); }
+    },
+    fontSizeable: {
+      get: () => config.font_size || defaultConfig.font_size,
+      set: v => { config.font_size = v; window.elementSdk.setConfig({font_size:v}); }
+    }
+  }),
+  mapToEditPanelValues: (config) => new Map([
+    ['app_title', config.app_title || defaultConfig.app_title],
+    ['slogan_text', config.slogan_text || defaultConfig.slogan_text]
+  ])
+});
+
+// ===== DATA SDK =====
+const dataHandler = {
+  onDataChanged(data) {
+    allData = data;
+    updateProgress();
+    updateJurnalList();
+    updateGuruPage();
+  }
+};
+
+(async () => {
+  const r = await window.dataSdk.init(dataHandler);
+  if (!r.isOk) console.error('Data SDK init failed');
+})();
+
+// ===== NAVIGATION =====
+function showPage(name) {
+  currentPage = name;
+  document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+  const page = document.getElementById('page-' + name);
+  if (page) page.classList.remove('hidden');
+
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.remove('active');
+    n.style.background = '';
+    n.style.color = '';
+  });
+  const navBtn = document.querySelector(`[data-nav="${name}"]`);
+  if (navBtn) {
+    navBtn.classList.add('active');
+    const cfg = window.elementSdk.config || {};
+    navBtn.style.background = `linear-gradient(135deg, ${cfg.primary_action_color || defaultConfig.primary_action_color}, #8b5cf6)`;
+  }
+
+  if (name === 'simulasi') initSimulasi();
+  if (name === 'quiz') initQuiz();
+  if (name === 'jurnal') { document.getElementById('jurnalDate').textContent = new Date().toLocaleDateString('id-ID', {weekday:'long',year:'numeric',month:'long',day:'numeric'}); }
+  if (name === 'progress') updateProgress();
+  if (name === 'guru') updateGuruPage();
+
+  document.getElementById('contentArea').scrollTop = 0;
+  lucide.createIcons();
+}
+
+function showMateriTab(id) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('materi-' + id).classList.add('active');
+  document.querySelectorAll('.materi-tab').forEach(b => { b.className = 'materi-tab whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold bg-gray-100 text-gray-600 transition'; });
+  event.target.className = 'materi-tab whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold bg-indigo-500 text-white transition';
+}
+
+// ===== TOAST =====
+function showToast(msg, color='bg-green-500') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast-msg ' + color + ' text-white show';
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ===== SIMULASI =====
+const scenarios = [
+{
+context: '📚 Diskusi Kelompok',
+dialog: 'Dalam diskusi kelompok, dua temanmu mulai berdebat keras.',
+character: '😤',
+options: ['Menengahi dengan tenang', 'Ikut memilih pihak', 'Diam saja'],
+answer: 0,
+feedback: ['✅ Keren, kamu jadi penengah!', 'Memperkeruh suasana.', 'Tidak membantu.']
+},
+{
+context: '📱 Salah Paham Chat',
+dialog: 'Temanmu tersinggung karena chatmu.',
+character: '😠',
+options: ['Jelaskan dan klarifikasi', 'Menyalahkan dia', 'Ignore saja'],
+answer: 0,
+feedback: ['✅ Bijak!', 'Memperburuk hubungan.', 'Masalah tidak selesai.']
+},
+{
+context: '🏫 Di Kelas',
+dialog: 'Temanmu berisik saat guru menjelaskan.',
+character: '😑',
+options: ['Tegur baik-baik', 'Ikut ngobrol', 'Biarkan'],
+answer: 0,
+feedback: ['✅ Sikap tepat!', 'Mengganggu kelas.', 'Tidak peduli.']
+},
+{
+context: '👨‍👩‍👧 Orang Tua',
+dialog: 'Orang tua tidak setuju pilihanmu.',
+character: '😔',
+options: ['Jelaskan dengan tenang', 'Marah', 'Diam'],
+answer: 0,
+feedback: ['✅ Dewasa!', 'Konflik meningkat.', 'Tidak selesai.']
+},
+{
+context: '🎤 Presentasi',
+dialog: 'Audiens mulai bosan.',
+character: '😴',
+options: ['Interaksi dengan audiens', 'Lanjut saja', 'Cepat selesai'],
+answer: 0,
+feedback: ['✅ Interaktif!', 'Membosankan.', 'Tidak efektif.']
+},
+{
+context: '👥 Teman Curhat',
+dialog: 'Teman curhat tapi kamu sibuk.',
+character: '😢',
+options: ['Jujur minta waktu lain', 'Pura-pura dengar', 'Abaikan'],
+answer: 0,
+feedback: ['✅ Jujur itu penting!', 'Tidak tulus.', 'Menyakiti.']
+},
+{
+context: '⚠️ Konflik Kelompok',
+dialog: 'Ada anggota tidak kerja.',
+character: '😒',
+options: ['Ajak bicara baik-baik', 'Marahi di depan', 'Diam'],
+answer: 0,
+feedback: ['✅ Solutif!', 'Memalukan.', 'Tidak selesai.']
+},
+{
+context: '😡 Sedang Marah',
+dialog: 'Kamu kesal dengan teman.',
+character: '😡',
+options: ['Gunakan "saya merasa"', 'Marah langsung', 'Sindiran'],
+answer: 0,
+feedback: ['✅ Sehat!', 'Memicu konflik.', 'Tidak jelas.']
+},
+{
+context: '📢 Kritik',
+dialog: 'Teman salah saat presentasi.',
+character: '😬',
+options: ['Kasih feedback baik', 'Tertawakan', 'Diam'],
+answer: 0,
+feedback: ['✅ Membangun!', 'Menyakitkan.', 'Tidak membantu.']
+},
+{
+context: '👀 Bahasa Tubuh',
+dialog: 'Teman terlihat tidak nyaman.',
+character: '😕',
+options: ['Tanya dengan empati', 'Lanjut saja', 'Abaikan'],
+answer: 0,
+feedback: ['✅ Empati tinggi!', 'Kurang peka.', 'Tidak peduli.']
+},
+{
+context: '📞 Telepon',
+dialog: 'Teman bicara terburu-buru.',
+character: '😵',
+options: ['Minta pelan & jelas', 'Ikut terburu', 'Matikan telp'],
+answer: 0,
+feedback: ['✅ Jelas!', 'Bingung.', 'Tidak sopan.']
+},
+{
+context: '📚 Belajar Bareng',
+dialog: 'Teman tidak paham materi.',
+character: '🤯',
+options: ['Jelaskan pelan', 'Kesal', 'Biarkan'],
+answer: 0,
+feedback: ['✅ Supportif!', 'Tidak membantu.', 'Egois.']
+},
+{
+context: '💬 Chat Grup',
+dialog: 'Diskusi grup mulai panas.',
+character: '🔥',
+options: ['Netral & menenangkan', 'Ikut panas', 'Keluar grup'],
+answer: 0,
+feedback: ['✅ Bijak!', 'Memperparah.', 'Menghindar.']
+},
+{
+context: '🎓 Guru Menegur',
+dialog: 'Guru menegur kamu.',
+character: '😶',
+options: ['Dengarkan & evaluasi', 'Membela diri', 'Diam kesal'],
+answer: 0,
+feedback: ['✅ Dewasa!', 'Kurang sopan.', 'Tidak berkembang.']
+},
+{
+context: '🤝 Kerja Tim',
+dialog: 'Ada perbedaan pendapat.',
+character: '🤔',
+options: ['Cari titik tengah', 'Memaksakan', 'Mengalah terus'],
+answer: 0,
+feedback: ['✅ Solusi terbaik!', 'Egois.', 'Tidak adil.']
+}
+];
+
+let simIndex = 0, simScore = 0, simAnswered = [];
+
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+function initSimulasi() {
+  simIndex = 0;
+  simScore = 0;
+  simAnswered = [];
+
+  scenarios.forEach(s => {
+    const combined = s.options.map((opt, i) => ({
+      text: opt,
+      correct: i === s.answer,
+      feedback: s.feedback[i] || '' // 🔥 ANTI UNDEFINED
+    }));
+
+    shuffleArray(combined);
+
+    s.options = combined.map(c => c.text);
+    s.correctIndex = combined.findIndex(c => c.correct);
+    s.feedbackMap = combined.map(c => c.feedback || '');
+  });
+
+  renderSimulasi();
+}
+
+function renderSimulasi() {
+  const c = document.getElementById('simContainer');
+  if (simIndex >= scenarios.length) {
+    const pct = Math.round((simScore / scenarios.length) * 100);
+    c.innerHTML = `
+      <div class="bg-white rounded-2xl p-6 text-center border border-purple-100 pop-in">
+        <div class="text-5xl mb-3">${pct >= 70 ? '🎉' : '💪'}</div>
+        <h3 class="font-heading font-800 text-2xl text-purple-800">Simulasi Selesai!</h3>
+        <p class="text-gray-600 mt-2">Skor kamu: <strong class="text-purple-600">${simScore}/${scenarios.length}</strong></p>
+        <p class="text-sm text-gray-500 mt-1">${pct >= 100 ? 'Sempurna! Kamu komunikator yang hebat!' : pct >= 70 ? 'Bagus sekali! Terus tingkatkan!' : 'Masih bisa lebih baik, yuk belajar lagi!'}</p>
+        <button onclick="initSimulasi()" class="btn-primary text-white mt-4 px-6 py-2 rounded-full font-semibold text-sm">Ulangi Simulasi</button>
+      </div>`;
+    saveActivity('simulasi', simScore, scenarios.length);
+    return;
+  }
+
+  const s = scenarios[simIndex];
+  c.innerHTML = `
+    <div class="mb-3"><span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">${s.context}</span></div>
+    <div class="flex gap-3 mb-4">
+      <div class="text-3xl">${s.character}</div>
+      <div class="scenario-bubble slide-in"><p class="text-sm text-indigo-800">${s.dialog}</p></div>
+    </div>
+    <p class="text-xs text-gray-400 mb-2 font-semibold">Pilih responmu:</p>
+    <div class="space-y-2" id="simOptions">
+      ${s.options.map((o, i) => `
+  <button onclick="answerSim(${i})"
+    class="response-bubble w-full text-left text-sm border-2 border-gray-200 bg-white hover:border-indigo-300"
+    id="simOpt${i}">
+    ${o}
+  </button>
+`).join('')}
+    </div>
+    <div id="simFeedback" class="mt-3 hidden"></div>
+    <div class="flex justify-between items-center mt-4">
+      <span class="text-xs text-gray-400">${simIndex + 1} / ${scenarios.length}</span>
+      <button onclick="nextSim()" class="btn-primary text-white px-5 py-2 rounded-full text-sm font-semibold hidden" id="simNextBtn">Lanjut →</button>
+    </div>`;
+}
+
+function answerSim(i) {
+  if (simAnswered.includes(simIndex)) return;
+  simAnswered.push(simIndex);
+
+  const s = scenarios[simIndex];
+  const isCorrect = i === s.correctIndex;
+
+  if (isCorrect) simScore++;
+
+  s.options.forEach((opt, idx) => {
+    const el = document.getElementById('simOpt' + idx);
+
+    if (idx === s.correctIndex) {
+      el.className = 'response-bubble w-full text-left text-sm border-2 border-green-400 bg-green-50';
+    } else if (idx === i) {
+      el.className = 'response-bubble w-full text-left text-sm border-2 border-red-400 bg-red-50';
+    } else {
+      el.className = 'response-bubble w-full text-left text-sm border-2 border-gray-200 bg-gray-50 opacity-50';
+    }
+
+    el.style.pointerEvents = 'none';
+  });
+
+  const fb = document.getElementById('simFeedback');
+  fb.classList.remove('hidden');
+  fb.innerHTML = `
+    <div class="p-3 rounded-xl text-sm ${
+      isCorrect ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+    } pop-in">
+      ${s.feedbackMap[i]}
+    </div>
+  `;
+
+  document.getElementById('simNextBtn').classList.remove('hidden');
+}
+
+function nextSim() { simIndex++; renderSimulasi(); }
+
+// ===== QUIZ =====
+const quizQuestions = [
+{
+q: 'Saat berdiskusi kelompok, kamu merasa pendapatmu sering dipotong oleh temanmu sehingga kamu tidak bisa menyampaikan ide secara utuh. Apa respon komunikasi interpersonal yang paling efektif dalam situasi ini?',
+opts: [
+'Tetap diam dan membiarkan saja agar tidak terjadi konflik',
+'Memotong balik pembicaraan teman agar kamu bisa didengar',
+'Menyampaikan dengan tenang bahwa kamu ingin menyelesaikan pendapat terlebih dahulu',
+'Meninggalkan diskusi karena merasa tidak dihargai'
+],
+ans: 2,
+explanation: 'Menyampaikan dengan tenang menunjukkan komunikasi asertif tanpa memperkeruh suasana.'
+},
+
+{
+q: 'Seorang teman curhat bahwa ia merasa tidak dihargai oleh orang lain. Namun kamu sebenarnya sedang sibuk dan tidak fokus. Apa sikap komunikasi interpersonal yang paling tepat?',
+opts: [
+'Mendengarkan sambil melakukan hal lain',
+'Menyuruhnya bercerita lain waktu dengan alasan jujur',
+'Memberikan respon singkat agar terlihat peduli',
+'Mengalihkan pembicaraan ke topik lain'
+],
+ans: 1,
+explanation: 'Kejujuran dan menghargai waktu lebih baik daripada mendengarkan tanpa fokus.'
+},
+
+{
+q: 'Dalam komunikasi dengan orang tua, kamu memiliki pendapat yang berbeda tentang pilihan karier. Apa strategi komunikasi yang paling efektif?',
+opts: [
+'Memaksakan pendapat karena itu masa depanmu',
+'Diam dan mengikuti saja tanpa diskusi',
+'Menyampaikan alasan secara logis dan tetap menghargai pendapat orang tua',
+'Menghindari pembicaraan agar tidak terjadi konflik'
+],
+ans: 2,
+explanation: 'Komunikasi efektif adalah menyampaikan pendapat dengan logis dan tetap menghargai lawan bicara.'
+},
+
+{
+q: 'Saat presentasi di kelas, kamu melihat audiens mulai tidak fokus. Apa tindakan komunikasi yang paling tepat?',
+opts: [
+'Tetap membaca slide sampai selesai',
+'Meningkatkan interaksi seperti bertanya atau memberi contoh menarik',
+'Menghentikan presentasi karena merasa gagal',
+'Mempercepat penjelasan tanpa memperhatikan audiens'
+],
+ans: 1,
+explanation: 'Interaksi meningkatkan keterlibatan audiens.'
+},
+
+{
+q: 'Temanmu mengirim pesan singkat yang terdengar kasar, tetapi kamu tidak yakin maksud sebenarnya. Apa langkah terbaik?',
+opts: [
+'Langsung membalas dengan emosi',
+'Mengabaikan pesan tersebut',
+'Mengklarifikasi maksud pesan dengan bertanya secara baik',
+'Menyimpulkan sendiri bahwa dia marah'
+],
+ans: 2,
+explanation: 'Klarifikasi menghindari kesalahpahaman dalam komunikasi digital.'
+},
+
+{
+q: 'Dalam kerja kelompok, ada anggota yang tidak berkontribusi. Apa pendekatan komunikasi terbaik?',
+opts: [
+'Langsung menyalahkan di depan semua anggota',
+'Membicarakan secara pribadi dan mencari solusi bersama',
+'Mengeluarkan dari kelompok',
+'Mengabaikan agar tidak ribut'
+],
+ans: 1,
+explanation: 'Pendekatan personal lebih efektif dan menjaga hubungan.'
+},
+
+{
+q: 'Saat kamu marah, bagaimana cara terbaik menyampaikan perasaan?',
+opts: [
+'Langsung meluapkan emosi',
+'Menggunakan kalimat "saya merasa..." dengan tenang',
+'Diam dan memendam',
+'Menyindir lewat media sosial'
+],
+ans: 1,
+explanation: 'Kalimat "saya" membantu komunikasi lebih sehat.'
+},
+
+{
+q: 'Kamu melihat temanmu melakukan kesalahan saat presentasi. Apa sikap terbaik?',
+opts: [
+'Menertawakan',
+'Mengkritik di depan umum',
+'Memberi masukan secara konstruktif setelah selesai',
+'Mengabaikan'
+],
+ans: 2,
+explanation: 'Feedback konstruktif membantu tanpa menjatuhkan.'
+},
+
+{
+q: 'Saat berbicara, bahasa tubuh yang tidak sesuai dapat menyebabkan...',
+opts: [
+'Pesan lebih jelas',
+'Salah paham',
+'Komunikasi lebih cepat',
+'Tidak berpengaruh'
+],
+ans: 1,
+explanation: 'Non-verbal sangat mempengaruhi makna pesan.'
+},
+
+{
+q: 'Jika lawan bicara menunjukkan ekspresi tidak nyaman, apa yang sebaiknya kamu lakukan?',
+opts: [
+'Tetap melanjutkan pembicaraan',
+'Mengabaikan',
+'Menyesuaikan cara komunikasi dan bertanya dengan empati',
+'Menyalahkan'
+],
+ans: 2,
+explanation: 'Empati penting dalam komunikasi interpersonal.'
+},
+
+{
+q: 'Dalam konflik, tujuan utama komunikasi adalah...',
+opts: [
+'Menang',
+'Menyalahkan',
+'Mencari solusi bersama',
+'Menghindar'
+],
+ans: 2,
+explanation: 'Fokus pada solusi adalah inti komunikasi sehat.'
+},
+
+{
+q: 'Apa risiko dari komunikasi yang tidak jelas?',
+opts: [
+'Meningkatkan kepercayaan',
+'Salah persepsi',
+'Mempercepat kerja',
+'Tidak ada dampak'
+],
+ans: 1,
+explanation: 'Pesan yang tidak jelas mudah disalahartikan.'
+},
+
+{
+q: 'Saat menerima kritik, sikap terbaik adalah...',
+opts: [
+'Defensif',
+'Marah',
+'Mendengarkan dan mengevaluasi',
+'Mengabaikan'
+],
+ans: 2,
+explanation: 'Kritik adalah peluang untuk berkembang.'
+},
+
+{
+q: 'Komunikasi efektif membutuhkan...',
+opts: [
+'Empati dan kejelasan',
+'Ego tinggi',
+'Dominasi',
+'Kecepatan bicara'
+],
+ans: 0,
+explanation: 'Empati dan kejelasan adalah kunci utama.'
+},
+
+{
+q: 'Dalam komunikasi interpersonal, kepercayaan dibangun melalui...',
+opts: [
+'Kejujuran dan konsistensi',
+'Manipulasi',
+'Diam',
+'Berbohong'
+],
+ans: 0,
+explanation: 'Kepercayaan lahir dari kejujuran.'
+}
+];
+
+let quizIndex = 0, quizScore = 0, quizAnswered = false;
+
+function initQuiz() {
+  quizIndex = 0; quizScore = 0; quizAnswered = false;
+  renderQuiz();
+}
+
+function renderQuiz() {
+  const c = document.getElementById('quizContainer');
+  if (quizIndex >= quizQuestions.length) {
+    const pct = Math.round((quizScore / quizQuestions.length) * 100);
+    let interp = '';
+    if (pct >= 80) interp = '🌟 Kamu komunikator yang sangat baik! Terus pertahankan!';
+    else if (pct >= 60) interp = '👍 Cukup baik! Ada beberapa hal yang bisa ditingkatkan.';
+    else interp = '💪 Yuk belajar lebih dalam tentang komunikasi interpersonal!';
+
+    c.innerHTML = `
+      <div class="bg-white rounded-2xl p-6 text-center border border-amber-100 pop-in">
+        <div class="text-5xl mb-3">${pct >= 80 ? '🏆' : pct >= 60 ? '⭐' : '📖'}</div>
+        <h3 class="font-heading font-800 text-2xl text-amber-800">Quiz Selesai!</h3>
+        <div class="my-4">
+          <div class="text-4xl font-heading font-900 text-indigo-600">${pct}%</div>
+          <p class="text-gray-500 text-sm">${quizScore} dari ${quizQuestions.length} benar</p>
+        </div>
+        <p class="text-sm text-gray-600 bg-amber-50 rounded-xl p-3">${interp}</p>
+        <button onclick="initQuiz()" class="btn-primary text-white mt-4 px-6 py-2 rounded-full font-semibold text-sm">Coba Lagi</button>
+      </div>`;
+    saveActivity('quiz', quizScore, quizQuestions.length);
+    return;
+  }
+
+  const q = quizQuestions[quizIndex];
+  quizAnswered = false;
+  c.innerHTML = `
+    <div class="bg-white rounded-2xl p-5 border border-amber-100 slide-in">
+      <div class="flex justify-between items-center mb-3">
+        <span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold">Soal ${quizIndex + 1}/${quizQuestions.length}</span>
+        <span class="text-xs text-gray-400 font-semibold">Skor: ${quizScore}</span>
+      </div>
+      <p class="font-heading font-700 text-gray-800 mb-4">${q.q}</p>
+      <div class="space-y-2" id="quizOptions">
+        ${q.opts.map((o, i) => `
+          <button onclick="answerQuiz(${i})" class="w-full text-left p-3 rounded-xl border-2 border-gray-200 text-sm hover:border-indigo-300 transition" id="qOpt${i}">${String.fromCharCode(65 + i)}. ${o}</button>
+        `).join('')}
+      </div>
+      <div id="quizFeedback" class="mt-3 hidden"></div>
+      <div class="mt-4 flex justify-end">
+        <button onclick="nextQuiz()" class="btn-primary text-white px-5 py-2 rounded-full text-sm font-semibold hidden" id="quizNextBtn">${quizIndex + 1 < quizQuestions.length ? 'Lanjut →' : 'Lihat Hasil'}</button>
+      </div>
+    </div>
+    <div class="flex gap-1 justify-center mt-4">
+      ${quizQuestions.map((_, i) => `<div class="w-2 h-2 rounded-full ${i === quizIndex ? 'bg-indigo-500' : i < quizIndex ? 'bg-green-400' : 'bg-gray-300'}"></div>`).join('')}
+    </div>`;
+}
+
+function answerQuiz(i) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const q = quizQuestions[quizIndex];
+  if (i === q.ans) quizScore++;
+
+  q.opts.forEach((_, idx) => {
+    const el = document.getElementById('qOpt' + idx);
+    if (idx === q.ans) el.className = 'w-full text-left p-3 rounded-xl border-2 border-green-400 bg-green-50 text-sm pointer-events-none font-semibold';
+    else if (idx === i) el.className = 'w-full text-left p-3 rounded-xl border-2 border-red-400 bg-red-50 text-sm pointer-events-none';
+    else el.className = 'w-full text-left p-3 rounded-xl border-2 border-gray-200 bg-gray-50 text-sm pointer-events-none opacity-50';
+  });
+
+  const fb = document.getElementById('quizFeedback');
+  fb.classList.remove('hidden');
+  fb.innerHTML = `<div class="p-3 rounded-xl text-sm bg-indigo-50 text-indigo-800 pop-in">💡 ${q.explanation}</div>`;
+  document.getElementById('quizNextBtn').classList.remove('hidden');
+}
+
+function nextQuiz() { quizIndex++; renderQuiz(); }
+
+// ===== SAVE ACTIVITY =====
+async function saveActivity(type, score, total) {
+  if (allData.length >= 999) { showToast('Batas data tercapai!', 'bg-red-500'); return; }
+  const btn = event?.target;
+  if (btn) btn.disabled = true;
+  const r = await window.dataSdk.create({
+    type: type,
+    content: `${type === 'quiz' ? 'Quiz' : 'Simulasi'}: ${score}/${total}`,
+    date: new Date().toISOString(),
+    score: Math.round((score / total) * 100),
+    activity: type,
+    completed: true
+  });
+  if (btn) btn.disabled = false;
+  if (r.isOk) showToast('Progress tersimpan! 🎉');
+  else showToast('Gagal menyimpan', 'bg-red-500');
+}
+
+// ===== JURNAL =====
+document.getElementById('jurnalForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const input = document.getElementById('jurnalInput');
+  const text = input.value.trim();
+  if (!text) return;
+  if (allData.length >= 999) { showToast('Batas data tercapai!', 'bg-red-500'); return; }
+
+  const btn = document.getElementById('jurnalSubmitBtn');
+  btn.disabled = true; btn.textContent = 'Menyimpan...';
+
+  const r = await window.dataSdk.create({
+    type: 'jurnal',
+    content: text,
+    date: new Date().toISOString(),
+    score: 0,
+    activity: 'jurnal',
+    completed: true
+  });
+
+  btn.disabled = false; btn.textContent = 'Simpan';
+  if (r.isOk) { input.value = ''; showToast('Jurnal tersimpan! 📝'); }
+  else showToast('Gagal menyimpan', 'bg-red-500');
+});
+
+function updateJurnalList() {
+  const jurnals = allData.filter(d => d.type === 'jurnal').sort((a, b) => new Date(b.date) - new Date(a.date));
+  const list = document.getElementById('jurnalList');
+  if (jurnals.length === 0) { list.innerHTML = '<p class="text-sm text-gray-400 text-center py-4">Belum ada jurnal. Yuk mulai menulis! ✍️</p>'; return; }
+
+  const existingIds = new Map([...list.children].map(el => [el.dataset.id, el]));
+  const newIds = new Set(jurnals.map(j => j.__backendId));
+
+  existingIds.forEach((el, id) => { if (!newIds.has(id)) el.remove(); });
+
+  jurnals.forEach((j, i) => {
+    const existing = existingIds.get(j.__backendId);
+    const dateStr = new Date(j.date).toLocaleDateString('id-ID', {weekday:'short', day:'numeric', month:'short'});
+    if (existing) {
+      existing.querySelector('.jurnal-content').textContent = j.content;
+      existing.querySelector('.jurnal-date').textContent = dateStr;
+    } else {
+      const div = document.createElement('div');
+      div.dataset.id = j.__backendId;
+      div.className = 'bg-white rounded-xl p-4 border border-green-100 slide-in';
+      div.style.animationDelay = (i * 0.05) + 's';
+      div.innerHTML = `
+        <div class="flex justify-between items-start">
+          <p class="text-sm text-gray-700 jurnal-content flex-1">${escHtml(j.content)}</p>
+          <button onclick="deleteJurnal(this, '${j.__backendId}')" class="text-red-400 hover:text-red-600 ml-2 shrink-0 text-xs">✕</button>
+        </div>
+        <p class="text-xs text-gray-400 mt-2 jurnal-date">${dateStr}</p>`;
+      list.appendChild(div);
+    }
+  });
+}
+
+async function deleteJurnal(btn, id) {
+  const rec = allData.find(d => d.__backendId === id);
+  if (!rec) return;
+  btn.disabled = true; btn.textContent = '...';
+  const r = await window.dataSdk.delete(rec);
+  if (r.isOk) showToast('Jurnal dihapus');
+  else { btn.disabled = false; btn.textContent = '✕'; showToast('Gagal menghapus', 'bg-red-500'); }
+}
+
+// ===== PROGRESS =====
+function updateProgress() {
+  const quizzes = allData.filter(d => d.type === 'quiz');
+  const sims = allData.filter(d => d.type === 'simulasi');
+  const jurnals = allData.filter(d => d.type === 'jurnal');
+
+  document.getElementById('statQuiz').textContent = quizzes.length;
+  document.getElementById('statSim').textContent = sims.length;
+  document.getElementById('statJurnal').textContent = jurnals.length;
+
+  const chart = document.getElementById('progressChart');
+  const msgEl = document.getElementById('noScoreMsg');
+  const lastScores = quizzes.slice(-5);
+
+  if (lastScores.length === 0) {
+    chart.innerHTML = '';
+    msgEl.textContent = 'Belum ada data quiz';
+  } else {
+    msgEl.textContent = '';
+    chart.innerHTML = lastScores.map((s, i) => {
+      const h = Math.max(10, s.score);
+      const color = s.score >= 80 ? 'bg-green-400' : s.score >= 60 ? 'bg-amber-400' : 'bg-red-400';
+      return `<div class="flex-1 flex flex-col items-center justify-end gap-1">
+        <span class="text-xs font-bold text-gray-600">${s.score}%</span>
+        <div class="${color} rounded-t-lg w-full transition-all duration-500" style="height:${h}%"></div>
+        <span class="text-xs text-gray-400">#${i + 1}</span>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ===== GURU BK =====
+function updateGuruPage() {
+  const quizzes = allData.filter(d => d.type === 'quiz');
+  const sims = allData.filter(d => d.type === 'simulasi');
+  const jurnals = allData.filter(d => d.type === 'jurnal');
+
+  document.getElementById('guruTotal').textContent = allData.length;
+
+  const scores = [...quizzes, ...sims].map(d => d.score).filter(s => typeof s === 'number');
+  document.getElementById('guruAvg').textContent = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) + '%' : '-';
+
+  const ql = document.getElementById('guruQuizList');
+  if (quizzes.length) {
+    ql.innerHTML = quizzes.slice(-5).reverse().map(q => `
+      <div class="flex justify-between items-center p-2 bg-indigo-50 rounded-lg">
+        <span class="text-sm text-gray-700">${q.content}</span>
+        <span class="text-xs font-bold ${q.score >= 80 ? 'text-green-600' : q.score >= 60 ? 'text-amber-600' : 'text-red-600'}">${q.score}%</span>
+      </div>`).join('');
+  } else { ql.innerHTML = '<p class="text-sm text-gray-400">Belum ada data</p>'; }
+
+  const jl = document.getElementById('guruJurnalList');
+  if (jurnals.length) {
+    jl.innerHTML = jurnals.slice(-5).reverse().map(j => `
+      <div class="p-2 bg-green-50 rounded-lg">
+        <p class="text-sm text-gray-700 line-clamp-2">${escHtml(j.content)}</p>
+        <p class="text-xs text-gray-400 mt-1">${new Date(j.date).toLocaleDateString('id-ID')}</p>
+      </div>`).join('');
+  } else { jl.innerHTML = '<p class="text-sm text-gray-400">Belum ada jurnal</p>'; }
+
+  const sl = document.getElementById('guruSimList');
+  if (sims.length) {
+    sl.innerHTML = sims.slice(-5).reverse().map(s => `
+      <div class="flex justify-between items-center p-2 bg-purple-50 rounded-lg">
+        <span class="text-sm text-gray-700">${s.content}</span>
+        <span class="text-xs font-bold ${s.score >= 80 ? 'text-green-600' : 'text-amber-600'}">${s.score}%</span>
+      </div>`).join('');
+  } else { sl.innerHTML = '<p class="text-sm text-gray-400">Belum ada data</p>'; }
+}
+
+function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+// Init
+document.getElementById('jurnalDate').textContent = new Date().toLocaleDateString('id-ID', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+lucide.createIcons();
+</script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9f2c1094019fd210',t:'MTc3NzI3NDQyNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
